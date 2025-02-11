@@ -12,6 +12,7 @@ import {
   TSOutputSymbol,
   TSSymbolFlags,
 } from "../symbols/index.js";
+import { JSDoc } from "./JSDoc.jsx";
 
 export interface VarDeclarationProps
   extends Omit<DeclarationProps, "nameKind"> {
@@ -20,6 +21,7 @@ export interface VarDeclarationProps
   var?: boolean;
   value?: Children;
   type?: Children;
+  doc?: string | string[];
 }
 
 /**
@@ -54,8 +56,8 @@ export function VarDeclaration(props: VarDeclarationProps) {
   };
 
   return <CoreDeclaration symbol={sym}>
-    {props.export ? "export " : ""}{props.default ? "default " : ""}{keyword} <Name />{type} = <AssignmentContext.Provider value={assignmentContext}>
+    <JSDoc content={props.doc}>{props.export ? "export " : ""}{props.default ? "default " : ""}{keyword} <Name />{type} = <AssignmentContext.Provider value={assignmentContext}>
       {props.value ?? props.children};
-    </AssignmentContext.Provider>
+    </AssignmentContext.Provider></JSDoc>
   </CoreDeclaration>;
 }

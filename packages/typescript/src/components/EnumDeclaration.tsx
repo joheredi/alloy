@@ -14,13 +14,23 @@ import {
   useTSScope,
 } from "../symbols/index.js";
 import { EnumMember } from "./EnumMember.jsx";
+import { JSDoc } from "./JSDoc.jsx";
 
 export interface EnumDeclarationProps
   extends Omit<DeclarationProps, "nameKind"> {
   /**
-   * A JS object representing the enum member names and values.
+   * The members of the enum.
    */
-  jsValue?: Record<string, string | number>;
+  members?: Record<string, string | number | EnumMemberDescriptor>;
+  /**
+   * Documentation for the enum.
+   */
+  doc?: string | string[];
+}
+
+export interface EnumMemberDescriptor {
+  jsValue: string | number;
+  doc?: string | string[];
 }
 
 /**
@@ -42,18 +52,22 @@ export function EnumDeclaration(props: EnumDeclarationProps) {
   sym.memberScope = createTSMemberScope(binder, scope, sym);
 
   const jsValueMembers = mapJoin(
-    Object.entries(props.jsValue ?? {}),
+    Object.entries(props.members ?? {}),
     ([name, value]) => {
-      return <EnumMember name={name} jsValue={value} />;
+      const jsValue = typeof value === "object" ? value.jsValue : value;
+      const doc = typeof value === "object" ? value.doc : undefined;
+      return <JSDoc content={doc}><EnumMember name={name} jsValue={jsValue} /></JSDoc>;
     },
     { joiner: ",\n" },
   );
 
   return <CoreDeclaration symbol={sym}>
+    <JSDoc content={props.doc}>
     {props.export ? "export " : ""}{props.default ? "default " : ""}enum <Name /> {"{"}
       <Scope value={sym.memberScope}>
         {jsValueMembers}{jsValueMembers.length > 0 && props.children && ",\n"}{props.children}
       </Scope>
     {"}"}
+    </JSDoc>
   </CoreDeclaration>;
 }

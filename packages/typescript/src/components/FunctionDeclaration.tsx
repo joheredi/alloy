@@ -13,10 +13,12 @@ import { useTSNamePolicy } from "../name-policy.js";
 import { createTSSymbol, TSSymbolFlags, useTSScope } from "../symbols/index.js";
 import { Declaration, DeclarationProps } from "./Declaration.js";
 import { Name } from "./Name.js";
+import { JSDoc } from "./JSDoc.jsx";
 
 export interface ParameterDescriptor {
   type: Children;
   refkey: Refkey;
+  doc?: string | string[];
 }
 
 function isParameterDescriptor(
@@ -31,6 +33,7 @@ export interface FunctionDeclarationProps
   parameters?: Record<string, Children | ParameterDescriptor>;
   returnType?: string;
   children?: Children;
+  doc?: string | string[];
 }
 
 export const functionParametersTag = Symbol();
@@ -50,17 +53,19 @@ export function FunctionDeclaration(props: FunctionDeclarationProps) {
     bodyChild ?? <FunctionDeclaration.Body>{filteredChildren}</FunctionDeclaration.Body>;
 
   return <Declaration {...props} nameKind="function">
-      function <Name /><Scope name={props.name} kind="function">
+      <JSDoc content={props.doc} parameters={props.parameters}>function <Name /><Scope name={props.name} kind="function">
         ({sParams}){sReturnType} {"{"}
           {sBody}
         {"}"}
       </Scope>
+      </JSDoc>
     </Declaration>;
 }
 
 export interface FunctionParametersProps {
   parameters?: Record<string, Children | ParameterDescriptor>;
   children?: Children;
+  doc?: string | string[];
 }
 
 FunctionDeclaration.Parameters = taggedComponent(
@@ -81,7 +86,7 @@ FunctionDeclaration.Parameters = taggedComponent(
         );
       }
 
-      value = mapJoin(
+      value = <JSDoc content={props.doc}>{mapJoin(
         new Map(Object.entries(props.parameters)),
         (key, value) => {
           const descriptor: ParameterDescriptor = isParameterDescriptor(value) ?
@@ -98,8 +103,8 @@ FunctionDeclaration.Parameters = taggedComponent(
 
           return <>{namePolicy.getName(sym.name, "parameter")}: {descriptor.type}</>;
         },
-        { joiner: "," },
-      );
+        { joiner: ", " },
+      )}</JSDoc>;
     } else {
       value = undefined;
     }

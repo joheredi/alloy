@@ -43,3 +43,16 @@ it("works end-to-end", () => {
     `,
   });
 });
+
+it("renders a var declaration with a doc comment", () => {
+  expect(
+    <Output>
+      <ts.SourceFile path="test.ts">
+        <ts.VarDeclaration name="myVar" doc="This is a test variable" value="456" />
+      </ts.SourceFile>
+    </Output>,
+  ).toRenderTo(`
+    /** This is a test variable */
+    const myVar = 456;
+  `);
+});

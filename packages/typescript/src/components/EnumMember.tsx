@@ -6,6 +6,7 @@ import {
 } from "../symbols/ts-output-symbol.js";
 import { ValueExpression } from "./ValueExpression.jsx";
 import { useTSNamePolicy } from "../name-policy.js";
+import { JSDoc } from "./JSDoc.jsx";
 
 export interface EnumMemberProps {
   /**
@@ -31,6 +32,10 @@ export interface EnumMemberProps {
    * The JS value of the enum member.
    */
   jsValue?: string | number;
+  /**
+   * Documentation for the enum member.
+   */
+  doc?: string | string[];
 }
 
 /**
@@ -52,5 +57,5 @@ export function EnumMember(props: EnumMemberProps) {
     <ValueExpression jsValue={props.jsValue} />
   : props.value;
 
-  return <>{nameCode} = {valueCode}</>;
+  return <JSDoc content={props.doc}>{nameCode} = {valueCode}</JSDoc>;
 }
