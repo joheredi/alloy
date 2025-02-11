@@ -89,7 +89,7 @@ it("supports the naming policy", () => {
 
 it("emits single-line JSDoc comments", () => {
   const res = toSourceText(
-    <ts.InterfaceDeclaration name="Foo" doc="This is a single-line comment" />
+    <ts.InterfaceDeclaration name="Foo" doc="This is a single-line comment" />,
   );
   expect(res).toEqual(d`
     /** This is a single-line comment */
@@ -104,7 +104,7 @@ it("emits multi-line JSDoc comments", () => {
     <ts.InterfaceDeclaration
       name="Foo"
       doc={["This is a multi-line comment", "with multiple lines"]}
-    />
+    />,
   );
   expect(res).toEqual(d`
     /**
@@ -121,7 +121,7 @@ it("emits JSDoc comments for interface members", () => {
   const res = toSourceText(
     <ts.InterfaceDeclaration name="Foo">
       <ts.InterfaceMember name="member" type="string" doc="Member description" />;
-    </ts.InterfaceDeclaration>
+    </ts.InterfaceDeclaration>,
   );
   expect(res).toEqual(d`
     interface Foo {
@@ -139,7 +139,7 @@ it("emits multi-line JSDoc comments for interface members", () => {
         type="string"
         doc={["Member description line 1", "Member description line 2"]}
       />;
-    </ts.InterfaceDeclaration>
+    </ts.InterfaceDeclaration>,
   );
   expect(res).toEqual(d`
     interface Foo {

@@ -86,7 +86,8 @@ FunctionDeclaration.Parameters = taggedComponent(
         );
       }
 
-      value = <JSDoc content={props.doc}>{mapJoin(
+      value =
+        <JSDoc content={props.doc}>{mapJoin(
         new Map(Object.entries(props.parameters)),
         (key, value) => {
           const descriptor: ParameterDescriptor = isParameterDescriptor(value) ?

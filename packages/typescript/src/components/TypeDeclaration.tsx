@@ -4,8 +4,8 @@ import { Name } from "./Name.js";
 
 export interface TypeDeclarationProps
   extends Omit<DeclarationProps, "nameKind"> {
-    doc?: string | string[];
-  }
+  doc?: string | string[];
+}
 
 export function TypeDeclaration(props: TypeDeclarationProps) {
   return <Declaration {...props} nameKind="type">

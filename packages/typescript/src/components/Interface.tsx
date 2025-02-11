@@ -6,8 +6,8 @@ import { JSDoc } from "./JSDoc.js";
 
 export interface InterfaceDeclarationProps
   extends Omit<DeclarationProps, "nameKind"> {
-    extends?: Children;
-    doc?: string | string[];
+  extends?: Children;
+  doc?: string | string[];
 }
 
 export function InterfaceDeclaration(props: InterfaceDeclarationProps) {

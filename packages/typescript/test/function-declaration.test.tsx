@@ -1,7 +1,11 @@
 import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
-import { FunctionDeclaration, ParameterDescriptor, VarDeclaration } from "../src/index.js";
+import {
+  FunctionDeclaration,
+  ParameterDescriptor,
+  VarDeclaration,
+} from "../src/index.js";
 import { toSourceText } from "./utils.js";
 
 it("works", () => {
@@ -72,8 +76,8 @@ it("supports parameters by element", () => {
 it("renders a function with a single-line doc comment", () => {
   expect(
     toSourceText(
-      <FunctionDeclaration name="foo" doc="This is a test function" />
-    )
+      <FunctionDeclaration name="foo" doc="This is a test function" />,
+    ),
   ).toBe(d`
     /** This is a test function */
     function foo() {
@@ -94,8 +98,8 @@ it("renders a function with parameter descriptors including docs", () => {
         }}
       >
         return a + b;
-      </FunctionDeclaration>
-    )
+      </FunctionDeclaration>,
+    ),
   ).toBe(d`
     /**
      * Function with params

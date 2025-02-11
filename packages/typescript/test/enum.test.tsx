@@ -62,8 +62,8 @@ it("renders an enum given a JS value", () => {
 
 it("renders an enum given member descriptors", () => {
   const members = {
-    foo: {jsValue: 1, doc: "Test Doc 1"} as ts.EnumMemberDescriptor,
-    bar: {jsValue: 2, doc: ["Multiline", "Doc"]} as ts.EnumMemberDescriptor,
+    foo: { jsValue: 1, doc: "Test Doc 1" } as ts.EnumMemberDescriptor,
+    bar: { jsValue: 2, doc: ["Multiline", "Doc"] } as ts.EnumMemberDescriptor,
   };
 
   expect(
@@ -84,7 +84,6 @@ it("renders an enum given member descriptors", () => {
     }
   `);
 });
-
 
 it("renders an enum given a JS value and children", () => {
   const members = {
@@ -196,11 +195,11 @@ it("renders an enum with a multi-line doc comment", () => {
       bar = 20
     }
   `);
-  });
+});
 
-  it("renders an enum with a multi-line doc comment, also for members", () => {
-    expect(
-      <Output>
+it("renders an enum with a multi-line doc comment, also for members", () => {
+  expect(
+    <Output>
         <ts.SourceFile path="foo.ts">
           <ts.EnumDeclaration name="AnotherEnum" doc={["Line one", "Line two"]}>
             <ts.EnumMember name="foo" jsValue={10}  doc={"Single line comment"} />,
@@ -208,7 +207,7 @@ it("renders an enum with a multi-line doc comment", () => {
           </ts.EnumDeclaration>
         </ts.SourceFile>
       </Output>,
-    ).toRenderTo(`
+  ).toRenderTo(`
       /**
        * Line one
        * Line two

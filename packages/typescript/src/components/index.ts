@@ -18,3 +18,4 @@ export * from "./Name.js";
 export * from "./TsConfigJson.js";
 export * from "./EnumDeclaration.jsx";
 export * from "./EnumMember.jsx";
+export * from "./JSDoc.jsx";

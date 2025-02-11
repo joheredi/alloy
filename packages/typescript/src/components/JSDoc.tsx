@@ -58,7 +58,9 @@ export function JSDoc(props: JSDocProps) {
   }
 
   // Combine the main content and parameter documentation, filtering out any empty lines.
-  const allContent = mainContent.concat(paramLines).filter(line => line.trim() !== "");
+  const allContent = mainContent
+    .concat(paramLines)
+    .filter((line) => line.trim() !== "");
   if (allContent.length === 0) {
     return props.children;
   }
@@ -79,12 +81,10 @@ export function JSDoc(props: JSDocProps) {
     `;
   }
 
-  return (
-    <>
+  return <>
       {jsDoc}
       {props.children}
-    </>
-  );
+    </>;
 }
 
 /**
