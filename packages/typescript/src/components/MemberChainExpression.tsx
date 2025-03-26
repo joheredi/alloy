@@ -1,6 +1,8 @@
-import { childrenArray, computed, For, List, Show } from "@alloy-js/core";
+import { childrenArray, computed, findKeyedChildren, For, isKeyedChild, List, Show } from "@alloy-js/core";
 import { Children, isComponentCreator } from "@alloy-js/core/jsx-runtime";
 import { FunctionCallExpression } from "./FunctionCallExpression.jsx";
+import { CommonMemberExpressionProps, MemberExpressionProps, memberIdentifierTag } from "./Id.jsx";
+import { C } from "vitest/dist/chunks/reporters.0x019-V2.js";
 
 export interface MemberChainExpressionProps {
   children: Children;
@@ -15,6 +17,10 @@ export function MemberChainExpression(props: MemberChainExpressionProps) {
   // chunks are constructed by consuming as many non-call expressions as
   // possible, then placing an indent and soft line break before and after the
   // any subsequent call expressions
+
+  findKeyedChildren(Array.isArray(props.children) ? props.children : [props.children], memberIdentifierTag).forEach((child) => {
+    console.log(child.props.nullish)
+  })
 
   const chunks = computed(() => {
     const children = flattenCallChains(childrenArray(() => props.children));
@@ -54,7 +60,8 @@ export function MemberChainExpression(props: MemberChainExpressionProps) {
         <For each={chunks.value[1]} softline>
           {(chunk) => (
             <>
-              .<List joiner="." children={chunk} />
+              {isOptionalSegment(chunk) ? "?." : "."}
+              <List joiner="." children={chunk} />
             </>
           )}
         </For>
@@ -64,7 +71,8 @@ export function MemberChainExpression(props: MemberChainExpressionProps) {
           <For each={chunks.value[1]} softline>
             {(chunk) => (
               <>
-                .<List joiner="." children={chunk} />
+                {isOptionalSegment(chunk) ? "?." : "."}
+                <List joiner="." children={chunk} />
               </>
             )}
           </For>
@@ -88,4 +96,17 @@ function flattenCallChains(children: Children[]): Children[] {
   }
 
   return flatChildren;
+}
+
+function isOptionalSegment(child: Children): boolean {
+
+  const isNullish = findKeyedChildren(
+    Array.isArray(child) ? child : [child],
+    memberIdentifierTag).some((child) => {
+      return Boolean(child.props.nullish)
+    });
+
+    console.log(isNullish);
+
+    return isNullish;
 }

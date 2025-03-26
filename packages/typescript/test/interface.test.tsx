@@ -1,4 +1,4 @@
-import { NamePolicyContext, refkey, StatementList } from "@alloy-js/core";
+import { List, NamePolicyContext, refkey, StatementList } from "@alloy-js/core";
 import "@alloy-js/core/testing";
 import { d } from "@alloy-js/core/testing";
 import { expect, it } from "vitest";
@@ -6,6 +6,7 @@ import * as ts from "../src/components/index.js";
 import { Reference } from "../src/components/Reference.js";
 import { createTSNamePolicy } from "../src/name-policy.js";
 import { toSourceText } from "./utils.js";
+import { MemberIdentifier } from "../src/components/Id.jsx";
 
 it("declares interfaces", () => {
   const res = toSourceText(<ts.InterfaceDeclaration name="Foo" />);
@@ -52,6 +53,46 @@ it("can create members", () => {
       member: string;
       circular: Foo;
       [str: string]: number;
+    }
+  `);
+});
+
+it.only("can create members with symbols", () => {
+  const memberRef = refkey("member");
+  const res = toSourceText(
+    <List>
+      <ts.InterfaceDeclaration name="Foo" refkey={refkey("Foo")}>
+        <StatementList>
+          <ts.InterfaceMember
+            name="member"
+            type="string"
+            refkey={memberRef}
+          />
+          <ts.InterfaceMember
+            name="circular"
+            type={<Reference refkey={refkey("Foo")} />}
+            refkey={refkey("circular")}
+          />
+        </StatementList>
+      </ts.InterfaceDeclaration>
+      <ts.FunctionDeclaration name="foo" parameters={[{name: "foo", type: refkey("Foo"), refkey: refkey("foo")}]}>
+        <ts.VarDeclaration const name="member">
+          <ts.MemberChainExpression>
+            <MemberIdentifier refkey={refkey("foo")} nullish={true}/>
+            <MemberIdentifier refkey={memberRef}/>
+          </ts.MemberChainExpression>
+        </ts.VarDeclaration>;
+      </ts.FunctionDeclaration>
+    </List>,
+  );
+
+  expect(res).toEqual(d`
+    interface Foo {
+      member: string;
+      circular: Foo;
+    }
+    function foo(foo: Foo) {
+      const member = foo.member;
     }
   `);
 });
@@ -122,7 +163,11 @@ it("supports the naming policy", () => {
   const res = toSourceText(
     <NamePolicyContext.Provider value={policy}>
       <ts.InterfaceDeclaration name="interface_name">
-        <ts.InterfaceMember name="member_property" type="string" />;
+        <ts.InterfaceMember
+          name="member_property"
+          type="string"
+          refkey={refkey()}
+        />;
       </ts.InterfaceDeclaration>
     </NamePolicyContext.Provider>,
   );

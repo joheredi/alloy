@@ -1,5 +1,13 @@
-import { Block, Children, Name } from "@alloy-js/core";
+import {
+  Block,
+  Children,
+  MemberDeclaration,
+  Name,
+  OutputSymbolFlags,
+  Refkey,
+} from "@alloy-js/core";
 import { useTSNamePolicy } from "../name-policy.js";
+import { createTSSymbol, TSOutputSymbol } from "../symbols/ts-output-symbol.js";
 import { BaseDeclarationProps, Declaration } from "./Declaration.js";
 
 export interface InterfaceDeclarationProps extends BaseDeclarationProps {
@@ -17,9 +25,10 @@ export interface InterfaceDeclarationProps extends BaseDeclarationProps {
  */
 export function InterfaceDeclaration(props: InterfaceDeclarationProps) {
   const extendsPart = props.extends ? <> extends {props.extends}</> : "";
+  const flags = OutputSymbolFlags.StaticMemberContainer;
 
   return (
-    <Declaration {...props} nameKind="interface">
+    <Declaration {...props} nameKind="interface" flags={flags}>
       interface <Name />
       {extendsPart} <InterfaceExpression>{props.children}</InterfaceExpression>
     </Declaration>
@@ -41,16 +50,30 @@ export interface InterfaceMemberProps {
   children?: Children;
   optional?: boolean;
   readonly?: boolean;
+  refkey?: Refkey;
 }
 
 /**
  * Create a TypeScript interface declaration.
  */
 export function InterfaceMember(props: InterfaceMemberProps) {
+  let sym: TSOutputSymbol | undefined;
   const namer = useTSNamePolicy();
+  const name = namer.getName(props.name ?? "", "interface-member");
+
   const type = props.type ?? props.children;
   const optionality = props.optional ? "?" : "";
   const readonly = props.readonly ? "readonly " : "";
+
+  if (props.name && props.refkey) {
+    const flags = OutputSymbolFlags.StaticMember;
+    sym = createTSSymbol({
+      name: name,
+      refkey: props.refkey,
+      flags,
+    });
+  }
+
   if (props.indexer) {
     return (
       <>
@@ -58,12 +81,17 @@ export function InterfaceMember(props: InterfaceMemberProps) {
       </>
     );
   } else {
-    return (
+    const memberContent = (
       <>
         {readonly}
-        {namer.getName(props.name!, "interface-member")}
+        {name}
         {optionality}: {type}
       </>
     );
+    return props.refkey ?
+        <MemberDeclaration symbol={sym} name={name} refkey={props.refkey}>
+          {memberContent}
+        </MemberDeclaration>
+      : memberContent;
   }
 }
