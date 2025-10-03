@@ -1,3 +1,5 @@
+import { Method } from "#components/method/method.jsx";
+import { createLibrary } from "#createLibrary";
 import { TestNamespace } from "#test/utils.jsx";
 import { Output } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
@@ -5,6 +7,37 @@ import { expect, it } from "vitest";
 import { ClassDeclaration } from "../class/declaration.jsx";
 import { SourceFile } from "../source-file/source-file.jsx";
 import { Namespace } from "./namespace.jsx";
+
+it("Should import the library namespace", () => {
+  const myLibrary = createLibrary("Azure.Core.MyLibrary", {
+    IFoo: {
+      kind: "interface",
+      members: {
+        Bar: { kind: "method" },
+      },
+    },
+  });
+  const tree = (
+    <Output>
+      <Namespace name="Azure.MyService">
+        <SourceFile path="Model1.cs">
+          <ClassDeclaration public name="Model1">
+            <Method public name="DoSomething" returns={myLibrary.IFoo} />
+          </ClassDeclaration>
+        </SourceFile>
+      </Namespace>
+    </Output>
+  );
+
+  expect(tree).toRenderTo(`
+    using Azure.Core.MyLibrary;
+    namespace Azure.MyService;
+
+    public class Model1
+    {
+        public IFoo DoSomething() {}
+    }`);
+});
 
 it("defines multiple namespaces and source files with unique content", () => {
   const tree = (
